@@ -24,7 +24,7 @@ readtodos(){
 }
 completetodo(){
     echo "todo is ${1}"
-    linenumber=$( cat $DAILYNOTEPATH | grep -n "^TODO${1}" | cut -c1-1 )
+    linenumber=$( cat $DAILYNOTEPATH | grep -n "^TODO${1}" | cut -d: -f1 )
     echo "line number is ${linenumber}"
     if [ ! -z $linenumber ]
         then
