@@ -14,10 +14,17 @@ cp ./dailynotes ~/bin
 # export an updated PATH in your ~.zshrc profile
 echo 'export PATH=$PATH:~/bin' >> ~/.zshrc
 ```
-Options:
+
+### Options:
 
     -h - Help - Outputs list of options and their description.
     
     -n - New note - Takes a string as argument and writes it to todays note.
 
     -r - Read Notes - Outputs contents of todays note.
+
+### To Do:
+- implement todos with getopts
+- add filtering to text inputs to avoid issues with special characters
+- create archiving functionality
+- create filter/search functions across date-range
