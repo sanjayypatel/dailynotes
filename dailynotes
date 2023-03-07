@@ -4,8 +4,11 @@ dailies_dir=~/dailies
 mkdir -p $dailies_dir
 
 # All functions will work relative to "today"
-todays_note=$dailies_dir/$( date +%m-%d-%Y ).txt
-touch $todays_note
+todays_note=$dailies_dir/$( date +%Y-%m-%d ).txt
+if [ ! -f $todays_note ]
+then
+    touch $todays_note
+fi
 
 dailies_help(){
     echo "Dailies Functions:"
@@ -63,8 +66,8 @@ completetodo(){
 # Create today's note and populate with yesterday's incomplete TODOS
 newdaily(){
     touch $todays_note 
-    yesterdaysnotepath=~/dailies/$( date -v -1d +%m-%d-%Y ).txt
-    echo "$( date +%m-%d-%Y ) daily notes" >> $todays_note 
+    yesterdaysnotepath=~/dailies/$( date -v -1d +%Y-%m-%d ).txt
+    echo "$( date +%Y-%m-%d ) daily notes" >> $todays_note 
     if [ -f $yesterdaysnotepath ]
         then
         cat $yesterdaysnotepath | grep '^TODO' | awk -F': ' '{print $NF}' > ~/dailies/todotemp.txt
