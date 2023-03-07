@@ -1,56 +1,10 @@
 #!/bin/zsh
 
-DAILYNOTEPATH=~/dailies/$( date +%m-%d-%Y ).txt
+dailies_dir=~/dailies
 
-note(){
-    echo "$(date +%H:%M ) $*" >> $DAILYNOTEPATH
-}
-todo(){
-    todocount=$( cat $DAILYNOTEPATH | grep -c '^TODO\|^XTODO' )
-    echo "TODO${todocount}: $(date +%H:%M ) $*" >> $DAILYNOTEPATH
-    echo "TODO ADDED: $*"
-}
-readnotes(){
-    echo $DAILYNOTEPATH
-    echo "===== ALL NOTES: ====="
-    cat $DAILYNOTEPATH
-    echo "===== ===== ===== ====="
-}
-readtodos(){
-    echo $DAILYNOTEPATH
-    echo "===== TODOS: ====="
-    cat $DAILYNOTEPATH | grep '^TODO\|^XTODO'
-    echo "===== ===== ===== ====="
-}
-completetodo(){
-    echo "todo is ${1}"
-    linenumber=$( cat $DAILYNOTEPATH | grep -n "^TODO${1}" | cut -d: -f1 )
-    echo "line number is ${linenumber}"
-    if [ ! -z $linenumber ]
-        then
-        sed -i "" "${linenumber}s/^/X/" $DAILYNOTEPATH
-        echo "Completed TODO${1}"
-    else
-        echo "TODO${1} not found or already complete."
-    fi
-}
-newdaily(){
-    touch $DAILYNOTEPATH 
-    yesterdaysnotepath=~/dailies/$( date -v -1d +%m-%d-%Y ).txt
-    echo "$( date +%m-%d-%Y ) daily notes" >> $DAILYNOTEPATH 
-    if [ -f $yesterdaysnotepath ]
-        then
-        cat $yesterdaysnotepath | grep '^TODO' | awk -F': ' '{print $NF}' > ~/dailies/todotemp.txt
-        declare -i num=0
-        while read todo; do
-            echo "TODO${num}: $todo" >> $DAILYNOTEPATH
-            num+=1
-        done<~/dailies/todotemp.txt
-        numcarriedtodos=$( cat $yesterdaysnotepath | grep -c '^TODO' )
-        echo "Carried over ${numcarriedtodos} TODO(s)"
-    fi
-    echo "${DAILYNOTEPATH} created."
-}
+# All functions will work relative to "today"
+todays_note=$dailies_dir/$( date +%m-%d-%Y ).txt
+
 dailieshelp(){
     echo "Dailies Functions:"
     echo "newdaily - make new notes labelled todays date. Will carry over uncompleted TODOs from yesterday."
@@ -62,17 +16,80 @@ dailieshelp(){
     echo "copytodos (path to notes file) - read supplied  notes file and copy incomplete TODOs to todays notes file."
 }
 
-copytodos(){
-    if [ -f $1 ]
+# Write a time-stamped note to todays_note
+note(){
+    echo "$(date +%H:%M ) $*" >> $todays_note
+}
+
+# create a note pre-fixed with TODO## 
+todo(){
+    todocount=$( cat $todays_note | grep -c '^TODO\|^XTODO' )
+    echo "TODO${todocount}: $(date +%H:%M ) $*" >> $todays_note
+    echo "TODO ADDED: $*"
+}
+
+# Show all of the contents of todays_note
+readnotes(){
+    echo $todays_note
+    echo "===== ALL NOTES: ====="
+    cat $todays_note
+    echo "===== ===== ===== ====="
+}
+
+# Show the contents of todays_note but filter for TODO lines
+readtodos(){
+    echo $todays_note
+    echo "===== TODOS: ====="
+    cat $todays_note | grep '^TODO\|^XTODO'
+    echo "===== ===== ===== ====="
+}
+
+# Mark a todo complete so it will no longer flow into future days
+completetodo(){
+    echo "todo is ${1}"
+    linenumber=$( cat $todays_note | grep -n "^TODO${1}" | cut -d: -f1 )
+    echo "line number is ${linenumber}"
+    if [ ! -z $linenumber ]
         then
-        cat $1 | grep '^TODO' | awk -F': ' '{print $NF}' > ~/dailies/todotemp.txt
-        todocount=$( cat $DAILYNOTEPATH | grep -c '^TODO\|^XTODO' )
-        declare -i num=$todocount
+        sed -i "" "${linenumber}s/^/X/" $todays_note
+        echo "Completed TODO${1}"
+    else
+        echo "TODO${1} not found or already complete."
+    fi
+}
+
+# Create today's note and populate with yesterday's incomplete TODOS
+newdaily(){
+    touch $todays_note 
+    yesterdaysnotepath=~/dailies/$( date -v -1d +%m-%d-%Y ).txt
+    echo "$( date +%m-%d-%Y ) daily notes" >> $todays_note 
+    if [ -f $yesterdaysnotepath ]
+        then
+        cat $yesterdaysnotepath | grep '^TODO' | awk -F': ' '{print $NF}' > ~/dailies/todotemp.txt
+        declare -i num=0
         while read todo; do
-            echo "TODO${num}: $todo" >> $DAILYNOTEPATH
+            echo "TODO${num}: $todo" >> $todays_note
             num+=1
         done<~/dailies/todotemp.txt
-        numcarriedtodos=$( cat $1 | grep -c '^TODO' )
+        numcarriedtodos=$( cat $yesterdaysnotepath | grep -c '^TODO' )
+        echo "Carried over ${numcarriedtodos} TODO(s)"
+    fi
+    echo "${todays_note} created."
+}
+
+# Copy the todos from the file passed as argument
+copytodos(){
+	previous_note=$1
+    if [ -f $previous_note ]
+        then
+        cat $previous_note | grep '^TODO' | awk -F': ' '{print $NF}' > ~/dailies/todotemp.txt
+        todocount=$( cat $todays_note | grep -c '^TODO\|^XTODO' )
+        declare -i num=$todocount
+        while read todo; do
+            echo "TODO${num}: $todo" >> $todays_note
+            num+=1
+        done<~/dailies/todotemp.txt
+        numcarriedtodos=$( cat $previous_note | grep -c '^TODO' )
         echo "Carried over ${numcarriedtodos} TODO(s)"
     fi
 }
