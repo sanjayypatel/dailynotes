@@ -1,22 +1,30 @@
 # dailynotes
-Shell library for maintaining daily notes and todos at command line.
 
-Source dailynotes.sh in your zshrc file.
+dailynotes is a zsh script that facilitatesa making plain text notes and todo lists. 
 
-Functions:
+### Setup
 
-    "dailieshelp - outputs list of functions and their descriptions."
+Add dailynotes to your PATH in your ~/.zshrc profile.  
+Example commands:
+```shell
+# copy dailynotes to a ~/bin
+mkdir -p ~/bin
+cp ./dailynotes ~/bin
+
+# export an updated PATH in your ~.zshrc profile
+echo 'export PATH=$PATH:~/bin' >> ~/.zshrc
+```
+
+### Options:
+
+    -h - Help - Outputs list of options and their description.
     
-    "newdaily - make new notes labelled todays date. Will carry over uncompleted TODOs from yesterday."
+    -n - New note - Takes a string as argument and writes it to todays note.
 
-    "note - will take all args, wrap in "" and echo into today's daily."
+    -r - Read Notes - Outputs contents of todays note.
 
-    "todo - takes all args, wraps in "" and prefixes with 'TODO: '"
-    
-    "completetodo (todo number) - Marks a TODO as complete by prepending an X."
-
-    "readnotes - will cat today's daily."
-
-    "readtodos - cat today's daily and grep for 'TODO'"
-
-    "copytodos (path to notes file) - reads incomplete TODOs from the provided notes file and copies them to todays notes. Renumbers the TODOs."
+### To Do:
+- implement todos with getopts
+- add filtering to text inputs to avoid issues with special characters
+- create archiving functionality
+- create filter/search functions across date-range
