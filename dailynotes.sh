@@ -1,9 +1,11 @@
 #!/bin/zsh
 
 dailies_dir=~/dailies
+mkdir -p $dailies_dir
 
 # All functions will work relative to "today"
 todays_note=$dailies_dir/$( date +%m-%d-%Y ).txt
+touch $todays_note
 
 dailieshelp(){
     echo "Dailies Functions:"
@@ -93,3 +95,4 @@ copytodos(){
         echo "Carried over ${numcarriedtodos} TODO(s)"
     fi
 }
+
