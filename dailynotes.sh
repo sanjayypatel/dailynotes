@@ -7,7 +7,7 @@ mkdir -p $dailies_dir
 todays_note=$dailies_dir/$( date +%m-%d-%Y ).txt
 touch $todays_note
 
-dailieshelp(){
+dailies_help(){
     echo "Dailies Functions:"
     echo "newdaily - make new notes labelled todays date. Will carry over uncompleted TODOs from yesterday."
     echo "note - will take all args, wrap in "" and echo into today's daily."
@@ -19,7 +19,7 @@ dailieshelp(){
 }
 
 # Write a time-stamped note to todays_note
-note(){
+new_note(){
     echo "$(date +%H:%M ) $*" >> $todays_note
 }
 
@@ -31,7 +31,7 @@ todo(){
 }
 
 # Show all of the contents of todays_note
-readnotes(){
+read_notes(){
     echo $todays_note
     echo "===== ALL NOTES: ====="
     cat $todays_note
@@ -39,7 +39,7 @@ readnotes(){
 }
 
 # Show the contents of todays_note but filter for TODO lines
-readtodos(){
+read_todos(){
     echo $todays_note
     echo "===== TODOS: ====="
     cat $todays_note | grep '^TODO\|^XTODO'
@@ -96,3 +96,19 @@ copytodos(){
     fi
 }
 
+while getopts "n:hr" option; do
+    case $option in
+        h) # display Help
+            dailies_help
+            exit;;
+        n) # New Note
+            new_note $OPTARG
+            exit;;
+        r) # Read Note
+            read_notes
+            exit;;
+        \?) # incorrect option
+            echo "Error: Invalid option"
+            exit;;
+    esac
+done
